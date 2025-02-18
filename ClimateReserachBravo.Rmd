@@ -1,0 +1,142 @@
+---
+title: "DataPreBravo"
+author: "vbagdi2"
+date: "2025-02-18"
+output: pdf_document
+---
+
+HURS
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(readr)  # For fast and efficient CSV reading
+
+# Set directories
+data_dir <- "/Users/vinayakbagdi/Downloads/HURS/"  # Directory containing CSV files
+output_dir <- "/Users/vinayakbagdi/Downloads/"  # Directory to save the final CSV
+
+# Initialize an empty list to store dataframes
+data_list <- list()
+
+# Loop through the years 1950 to 2014
+for (year in 1950:2014) {
+  # Construct file path
+  file_path <- file.path(data_dir, paste0("hurs_data_", year, ".csv"))
+  
+  # Check if the file exists before attempting to read
+  if (file.exists(file_path)) {
+    # Read CSV file ensuring proper column names
+    df <- read_csv(file_path, col_names = c("time", "station", "latitude", "longitude", "hurs"), skip = 1)
+    
+    # Add a new column for the year
+    df$Year <- year
+    
+    # Store dataframe in the list
+    data_list[[as.character(year)]] <- df
+  } else {
+    message(paste("File not found:", file_path))
+  }
+}
+
+# Combine all dataframes into one
+final_data <- bind_rows(data_list)
+
+# Display the first few rows
+head(final_data)
+
+# Define the output file path
+output_file <- file.path(output_dir, "combined_hurs.csv")
+
+# Save the combined data to the specified directory
+write_csv(final_data, output_file)
+
+# Print success message
+message("Combined data saved to: ", output_file)
+
+```
+TAS
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(readr)  # For fast and efficient CSV reading
+
+# Set directories
+data_dir <- "/Users/vinayakbagdi/Downloads/TAS/"  # Directory containing CSV files
+output_dir <- "/Users/vinayakbagdi/Downloads/"  # Directory to save the final CSV
+
+# Initialize an empty list to store dataframes
+data_list <- list()
+
+# Loop through the years 1950 to 2014
+for (year in 1950:2014) {
+  # Construct file path
+  file_path <- file.path(data_dir, paste0("tas_data_", year, ".csv"))
+  
+  # Check if the file exists before attempting to read
+  if (file.exists(file_path)) {
+    # Read CSV file ensuring proper column names
+    df <- read_csv(file_path, col_names = c("time", "station", "latitude", "longitude", "tas"), skip = 1)
+    
+    # Add a new column for the year
+    df$Year <- year
+    
+    # Store dataframe in the list
+    data_list[[as.character(year)]] <- df
+  } else {
+    message(paste("File not found:", file_path))
+  }
+}
+
+# Combine all dataframes into one
+final_data <- bind_rows(data_list)
+
+# Display the first few rows
+head(final_data)
+
+# Define the output file path
+output_file <- file.path(output_dir, "combined_tas.csv")
+
+# Save the combined data to the specified directory
+write_csv(final_data, output_file)
+
+# Print success message
+message("Combined data saved to: ", output_file)
+```
+
+changing tas from K -> F
+```{r}
+# Load necessary library
+library(readr)  # For fast CSV reading and writing
+library(dplyr)  # For data manipulation
+
+# Set file paths
+input_file <- "/Users/vinayakbagdi/Downloads/combined_tas.csv"
+output_file <- "/Users/vinayakbagdi/Downloads/converted_tas.csv"
+
+# Read the CSV file
+if (file.exists(input_file)) {
+  data <- read_csv(input_file)
+  
+  # Check if 'tas' column exists
+  if ("tas" %in% colnames(data)) {
+    # Convert tas from Kelvin to Fahrenheit
+    data <- data %>%
+      mutate(tas_F = (tas - 273.15) * 9/5 + 32)  # Fahrenheit conversion
+    
+    # Save the modified data
+    write_csv(data, output_file)
+    
+    # Print success message
+    message("Conversion successful! File saved at: ", output_file)
+  } else {
+    message("Error: 'tas' column not found in the dataset.")
+  }
+} else {
+  message("Error: Input file not found at: ", input_file)
+}
+
+```
+
+
+
