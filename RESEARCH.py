@@ -18,7 +18,8 @@ def calculate_hi(row):
     T = row["T"]
     RH = row["RH"]
     
-    if T <= 80:
+    counter = 0.5 * (T + 61.0 + ((T-68.0)*1.2) + (RH*0.094))
+    if (counter*T)/2 < 80:
         return np.nan  
     
     HI = (-42.379 + 2.04901523 * T + 10.14333127 * RH - 0.22475541 * T * RH 
