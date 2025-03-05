@@ -60,6 +60,7 @@ for year in df["Year"].unique():
 # The difference (excess HI) is summed over all heatwave days.
 # This metric accounts for both the magnitude and duration of extreme heat.
 # A higher value indicates stronger and more prolonged heatwaves
+# https://pmc.ncbi.nlm.nih.gov/articles/PMC4306859/#:~:text=If%20the%20daily%20mean%20temperature%20(DMT)%20averaged,are%20deemed%20to%20be%20in%20heatwave%20conditions.&text=Heatwave%20intensity%20has%20been%20calculated%20as%20the,long%2Dterm%20and%20short%2Dterm%20daily%20mean%20temperature%20anomaly.
 
 # Compute the length of the heatwave season
 first_heatwave = df[df["Heat_Wave_Day"]].groupby("Year")["Julian_Date"].min()
