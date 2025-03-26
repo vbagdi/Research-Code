@@ -3,11 +3,8 @@ import numpy as np
 import os
 
 base_path = "/Users/vinayakbagdi/Downloads/"
-output_folder = os.path.join(base_path, "heat_wave_outputs_ssp126")
-os.makedirs(output_folder, exist_ok=True)
-
-tas_file = os.path.join(base_path, "converted_tas_ssp126.csv")
-hurs_file = os.path.join(base_path, "combined_hurs_ssp126.csv")
+tas_file = os.path.join(base_path, "converted_tas.csv")
+hurs_file = os.path.join(base_path, "combined_hurs.csv")
 
 tas_df = pd.read_csv(tas_file)
 hurs_df = pd.read_csv(hurs_file)
@@ -42,11 +39,12 @@ def calculate_hi(row):
     return HI
 
 merged_df["HI"] = merged_df.apply(calculate_hi, axis=1)
+
 merged_df = merged_df.dropna(subset=["HI"])
 
 output_files = []
 all_years_df = []
-for year in range(2015, 2101):
+for year in range(1950, 2015):
     year_df = merged_df[merged_df["Year"] == year].copy()
     if not year_df.empty:
         hi_98th = np.percentile(year_df["HI"], 98)
@@ -61,14 +59,14 @@ for year in range(2015, 2101):
 
         year_df["Heat_Wave_Day"] = classify_heat_wave(year_df["Hot_Day"].tolist())
 
-        output_file = os.path.join(output_folder, f"heat_wave_classification_{year}.csv")
+        output_file = os.path.join(base_path, f"heat_wave_classification_{year}.csv")
         year_df.to_csv(output_file, index=False)
         output_files.append(output_file)
         all_years_df.append(year_df)
         print(f"Classification complete for {year}. Results saved to {output_file}")
 
 final_df = pd.concat(all_years_df, ignore_index=True)
-final_output_file = os.path.join(output_folder, "heat_wave_classification_all_years_ssp126.csv")
+final_output_file = os.path.join(base_path, "heat_wave_classification_all_years.csv")
 final_df.to_csv(final_output_file, index=False)
 
 print(f"All years merged. Final dataset saved to {final_output_file}")
