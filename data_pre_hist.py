@@ -13,7 +13,7 @@ tas_df = tas_df.rename(columns={"tas_F": "T"})
 hurs_df = hurs_df.rename(columns={"hurs": "RH"})  
 
 merged_df = pd.merge(tas_df, hurs_df, on=["time", "Year"])
-
+print(tas_df)
 def calculate_hi(row):
     T = row["T"]
     RH = row["RH"]

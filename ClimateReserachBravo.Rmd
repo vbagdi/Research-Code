@@ -20,12 +20,12 @@ HURS
 library(dplyr)
 library(readr)
 
-data_dir <- "/Users/vinayakbagdi/Downloads/ssp126_hurs/"
+data_dir <- "/Users/vinayakbagdi/Downloads/HURS/"
 output_dir <- "/Users/vinayakbagdi/Downloads/"
 
 data_list <- list()
 
-for (year in 2015:2100) {
+for (year in 1950:2014) {
   file_path <- file.path(data_dir, paste0("hurs_data_", year, ".csv"))
   if (file.exists(file_path)) {
     df <- read_csv(file_path, col_names = c("time", "station", "latitude", "longitude", "hurs"), skip = 1)
@@ -39,7 +39,7 @@ for (year in 2015:2100) {
 final_data <- bind_rows(data_list)
 head(final_data)
 
-output_file <- file.path(output_dir, "combined_hurs_ssp126.csv")
+output_file <- file.path(output_dir, "combined_hurs.csv")
 write_csv(final_data, output_file)
 message("Combined data saved to: ", output_file)
 
