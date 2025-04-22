@@ -3,8 +3,8 @@ import numpy as np
 import os
 
 base_path = "/Users/vinayakbagdi/Downloads/"
-tas_file = os.path.join(base_path, "converted_tas.csv")
-hurs_file = os.path.join(base_path, "combined_hurs.csv")
+tas_file = os.path.join(base_path, "converted_ssp585_tas.csv")
+hurs_file = os.path.join(base_path, "combined_ssp585_hurs.csv")
 
 tas_df = pd.read_csv(tas_file)
 hurs_df = pd.read_csv(hurs_file)
@@ -44,7 +44,7 @@ merged_df = merged_df.dropna(subset=["HI"])
 
 output_files = []
 all_years_df = []
-for year in range(1950, 2015):
+for year in range(2015, 2101):
     year_df = merged_df[merged_df["Year"] == year].copy()
     if not year_df.empty:
         hi_98th = np.percentile(year_df["HI"], 98)
@@ -66,7 +66,7 @@ for year in range(1950, 2015):
         print(f"Classification complete for {year}. Results saved to {output_file}")
 
 final_df = pd.concat(all_years_df, ignore_index=True)
-final_output_file = os.path.join(base_path, "heat_wave_classification_all_years.csv")
+final_output_file = os.path.join(base_path, "heat_wave_classification_all_years_ssp585.csv")
 final_df.to_csv(final_output_file, index=False)
 
 print(f"All years merged. Final dataset saved to {final_output_file}")
