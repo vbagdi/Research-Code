@@ -6,10 +6,10 @@ import numpy as np
 
 # ========== CONFIG ==========
 files = {
-    "historical": "/Users/vinayakbagdi/Downloads/Research_Code/Full Research Data/research data/heat_wave_classification_all_years_historical.csv",
-    "ssp126": "/Users/vinayakbagdi/Downloads/Research_Code/Full Research Data/research data/heat_wave_classification_all_years_ssp126.csv",
-    "ssp245": "/Users/vinayakbagdi/Downloads/Research_Code/Full Research Data/research data/heat_wave_classification_all_years_ssp245.csv",
-    "ssp585": "/Users/vinayakbagdi/Downloads/Research_Code/Full Research Data/research data/heat_wave_classification_all_years_ssp585.csv"
+    "historical": "/Users/vinayakbagdi/Downloads/boston/historical/heat_wave_classification_all_years_historical_boston.csv",
+    "ssp126": "/Users/vinayakbagdi/Downloads/boston/ssp126/heat_wave_classification_all_years_ssp126_boston.csv",
+    "ssp245": "/Users/vinayakbagdi/Downloads/boston/ssp245/heat_wave_classification_all_years_ssp245_boston.csv",
+    "ssp585": "/Users/vinayakbagdi/Downloads/boston/ssp585/heat_wave_classification_all_years_ssp585_boston.csv"
 }
 
 metrics = ['avg_duration', 'avg_intensity', 'avg_yearly_frequency', 'avg_yearly_season_length']

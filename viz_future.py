@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import os
 
 # Load dataset
-base_path = "/Users/vinayakbagdi/Downloads/"
-file_path = os.path.join(base_path, "heat_wave_classification_all_years_ssp126.csv")
+base_path = "/Users/vinayakbagdi/Downloads/boston/historical"
+file_path = os.path.join(base_path, "heat_wave_classification_all_years_historical_boston.csv")
 df = pd.read_csv(file_path)
 
 df["time"] = pd.to_datetime(df["time"], errors="coerce")
@@ -14,10 +14,10 @@ df["Month"] = df["time"].dt.month
 df["Year"] = df["time"].dt.year
 
 # Only keep future years
-df = df[df["Year"] >= 2015]
+df = df[df["Year"] >= 1950]
 
 # Define future decades
-future_decades = [(y, y+9) for y in range(2015, 2101, 10)]
+future_decades = [(y, y+9) for y in range(1950, 2015, 10)]
 
 metrics = []
 

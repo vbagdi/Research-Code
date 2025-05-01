@@ -20,13 +20,13 @@ HURS
 library(dplyr)
 library(readr)
 
-data_dir <- "/Users/vinayakbagdi/Downloads/ssp585_hurs"
-output_dir <- "/Users/vinayakbagdi/Downloads/"
+data_dir <- "/Users/vinayakbagdi/Downloads/boston/ssp585/hurs"
+output_dir <- "/Users/vinayakbagdi/Downloads/boston/ssp585"
 
 data_list <- list()
 
 for (year in 2015:2100) {
-  file_path <- file.path(data_dir, paste0("hurs_data_", year, ".csv"))
+  file_path <- file.path(data_dir, paste0("hurs_boston_", year, ".csv"))
   if (file.exists(file_path)) {
     df <- read_csv(file_path, col_names = c("time", "station", "latitude", "longitude", "hurs"), skip = 1)
     df$Year <- year
@@ -39,7 +39,7 @@ for (year in 2015:2100) {
 final_data <- bind_rows(data_list)
 head(final_data)
 
-output_file <- file.path(output_dir, "combined_ssp585_hurs.csv")
+output_file <- file.path(output_dir, "combined_ssp585_hurs_boston.csv")
 write_csv(final_data, output_file)
 message("Combined data saved to: ", output_file)
 
@@ -50,13 +50,13 @@ TAS
 library(dplyr)
 library(readr)
 
-data_dir <- "/Users/vinayakbagdi/Downloads/ssp585_tas"
-output_dir <- "/Users/vinayakbagdi/Downloads/"
+data_dir <- "/Users/vinayakbagdi/Downloads/boston/ssp585/tas"
+output_dir <- "/Users/vinayakbagdi/Downloads/boston/ssp585"
 
 data_list <- list()
 
 for (year in 2015:2100) {
-  file_path <- file.path(data_dir, paste0("tas_data_", year, ".csv"))
+  file_path <- file.path(data_dir, paste0("tas_boston_", year, ".csv"))
   if (file.exists(file_path)) {
     df <- read_csv(file_path, col_names = c("time", "station", "latitude", "longitude", "tas"), skip = 1)
     df$Year <- year
@@ -69,7 +69,7 @@ for (year in 2015:2100) {
 final_data <- bind_rows(data_list)
 head(final_data)
 
-output_file <- file.path(output_dir, "combined_ssp585_tas.csv")
+output_file <- file.path(output_dir, "combined_ssp585_tas_boston.csv")
 write_csv(final_data, output_file)
 message("Combined data saved to: ", output_file)
 
@@ -80,8 +80,8 @@ changing tas from K -> F
 library(readr)
 library(dplyr)
 
-input_file <- "/Users/vinayakbagdi/Downloads/combined_ssp585_tas.csv"
-output_file <- "/Users/vinayakbagdi/Downloads/converted_ssp585_tas.csv"
+input_file <- "/Users/vinayakbagdi/Downloads/boston/ssp585/combined_ssp585_tas_boston.csv"
+output_file <-  "/Users/vinayakbagdi/Downloads/boston/ssp585/converted_ssp585_tas_boston.csv"
 
 if (file.exists(input_file)) {
   data <- read_csv(input_file)
