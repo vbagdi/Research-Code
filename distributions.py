@@ -1,15 +1,15 @@
 import pandas as pd
 import os
-from scipy.stats import theilslopes
+from scipy.stats import theilslopes, kendalltau
 import matplotlib.pyplot as plt
 import numpy as np
 
 # ========== CONFIG ==========
 files = {
-    "historical": "/Users/vinayakbagdi/Downloads/boston/historical/heat_wave_classification_all_years_historical_boston.csv",
-    "ssp126": "/Users/vinayakbagdi/Downloads/boston/ssp126/heat_wave_classification_all_years_ssp126_boston.csv",
-    "ssp245": "/Users/vinayakbagdi/Downloads/boston/ssp245/heat_wave_classification_all_years_ssp245_boston.csv",
-    "ssp585": "/Users/vinayakbagdi/Downloads/boston/ssp585/heat_wave_classification_all_years_ssp585_boston.csv"
+    "historical": "/Users/vinayakbagdi/Downloads/Research_Code/chicago/research data/heat_wave_classification_all_years_historical.csv",
+    "ssp126": "/Users/vinayakbagdi/Downloads/Research_Code/chicago/research data/heat_wave_classification_all_years_ssp126.csv",
+    "ssp245": "/Users/vinayakbagdi/Downloads/Research_Code/chicago/research data/heat_wave_classification_all_years_ssp245.csv",
+    "ssp585": "/Users/vinayakbagdi/Downloads/Research_Code/chicago/research data/heat_wave_classification_all_years_ssp585.csv"
 }
 
 metrics = ['avg_duration', 'avg_intensity', 'avg_yearly_frequency', 'avg_yearly_season_length']
@@ -77,64 +77,51 @@ for label, path in files.items():
 
 final_df = pd.concat(all_results, ignore_index=True)
 
-# ========== SEN'S SLOPE + VARIABILITY ==========
-sen_slopes = {}
-variability = {}
+# ========== CALCULATE SEN'S SLOPE + P-VALUES ==========
+results_for_csv = []
+results_for_heatmap = {}
 for label, group in final_df.groupby('scenario'):
+    row = {'Scenario': label.upper()}
     for metric in metrics:
-        slope, intercept, _, _ = theilslopes(group[metric], group['decade'])
-        sen_slopes[f'{label}_{metric}_slope'] = slope
-        variability[f'{label}_{metric}_std'] = group[metric].std()
+        slope, _, _, _ = theilslopes(group[metric], group['decade'])
+        _, p_value = kendalltau(group['decade'], group[metric])
+        slope_p = f"{slope:.3f} (p={p_value:.3f})"
+        row[metric.replace("avg_", "").replace("_", " ").title()] = slope_p
+        results_for_heatmap[f"{metric}_{label}"] = f"{slope:.3f}\n(p={p_value:.3f})"
+    results_for_csv.append(row)
 
-# Save summary tables
-pd.DataFrame([sen_slopes]).to_csv(os.path.join(output_dir, "sens_slope_summary.csv"), index=False)
-pd.DataFrame([variability]).to_csv(os.path.join(output_dir, "std_dev_summary.csv"), index=False)
+# Save to CSV
+summary_df = pd.DataFrame(results_for_csv)
+summary_df.to_csv(os.path.join(output_dir, "sens_slope_ci_summary.csv"), index=False)
 
-# ========== PLOTTING: METRIC TRENDS ==========
-for metric in metrics:
-    plt.figure(figsize=(10, 6))
-    for scenario in files:
-        subset = final_df[final_df['scenario'] == scenario]
-        plt.plot(subset['decade'], subset[metric], marker='o', label=scenario.upper())
-    plt.xlabel("Decade")
-    plt.ylabel(metric.replace('_', ' ').title())
-    plt.title(f"Trend Comparison: {metric.replace('_', ' ').title()}")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(f"{output_dir}trend_{metric}.png")
-    plt.close()  # This ensures plots don’t overlap
-
-
-# ========== PLOTTING: HEATMAPS W/ MATPLOTLIB ==========
-def plot_heatmap(data_dict, title, filename, fmt=".3f", cmap="coolwarm"):
-    df = pd.DataFrame(data_dict, index=[0]).T.reset_index()
-    df.columns = ['metric_scenario', 'value']
-    df[['scenario', 'metric']] = df['metric_scenario'].str.extract(r'^(.*?)_(avg_.*?)_(?:slope|std)')
-    pivot = df.pivot(index='metric', columns='scenario', values='value')
+# ========== PLOT HEATMAP (WITH SLOPE + P-VALUE) ==========
+def plot_slope_pvalue_heatmap(results_dict, title, filename):
+    records = []
+    for k, v in results_dict.items():
+        metric, scenario = k.split("_", 1)
+        records.append({'Metric': metric, 'Scenario': scenario.upper(), 'Value': v})
+    df = pd.DataFrame(records)
+    df['Metric'] = df['Metric'].str.replace("avg_", "").str.replace("_", " ").str.title()
+    heatmap_df = df.pivot(index='Metric', columns='Scenario', values='Value')
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    cax = ax.imshow(pivot.values, cmap=cmap, aspect='auto')
-    ax.set_xticks(np.arange(len(pivot.columns)))
-    ax.set_yticks(np.arange(len(pivot.index)))
-    ax.set_xticklabels(pivot.columns)
-    ax.set_yticklabels([label.replace('_', ' ').title() for label in pivot.index])
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    ax.imshow(np.zeros_like(heatmap_df.values, dtype=float), cmap="Greys", vmin=0, vmax=1)
 
-    for i in range(len(pivot.index)):
-        for j in range(len(pivot.columns)):
-            value = pivot.iloc[i, j]
-            ax.text(j, i, format(value, fmt), ha="center", va="center", color="black")
+    ax.set_xticks(np.arange(len(heatmap_df.columns)))
+    ax.set_yticks(np.arange(len(heatmap_df.index)))
+    ax.set_xticklabels(heatmap_df.columns)
+    ax.set_yticklabels(heatmap_df.index)
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+
+    for i in range(len(heatmap_df.index)):
+        for j in range(len(heatmap_df.columns)):
+            text = heatmap_df.iloc[i, j]
+            ax.text(j, i, text, ha="center", va="center", color="black", fontsize=10)
 
     ax.set_title(title)
-    fig.colorbar(cax)
     fig.tight_layout()
     plt.savefig(os.path.join(output_dir, filename))
     plt.show()
 
-# Plot both heatmaps
-plot_heatmap(sen_slopes, "Sen's Slope (Trend Strength)", "sens_slope_heatmap.png", fmt=".3f", cmap="coolwarm")
-plot_heatmap(variability, "Standard Deviation (Inter-Decadal Variability)", "std_dev_heatmap.png", fmt=".2f", cmap="YlGnBu")
-
-# ========== FINAL SAVE ==========
-final_df.to_csv(os.path.join(output_dir, "heatwave_decadal_comparison.csv"), index=False)
+# Create the heatmap
+plot_slope_pvalue_heatmap(results_for_heatmap, "Sen's Slope Trends with p-values", "sens_slope_heatmap_pvals.png")
